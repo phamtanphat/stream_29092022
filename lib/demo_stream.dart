@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class DemoStreamPage extends StatefulWidget {
@@ -34,16 +36,36 @@ class _DemoStreamPageState extends State<DemoStreamPage> {
     // });
 
     // Khởi tạo stream thông qua periodic
-    Stream<int> streamPeriodic = Stream.periodic(
-                                          Duration(seconds: 1), (count) => count).asBroadcastStream();
-    streamPeriodic.listen((event) {
-      print("Listen1 $event");
+    // Stream<int> streamPeriodic = Stream.periodic(
+    //                                       Duration(seconds: 1), (count) => count).asBroadcastStream();
+    // var subscription = streamPeriodic.listen((event) {
+    //   print(event);
+    // });
+    //
+    // streamPeriodic.listen((event) {
+    //   if (event == 5) {
+    //     subscription.pause();
+    //   }
+    // });
+
+    // 2: StreamController
+
+    StreamController<String> textController = StreamController();
+
+    Stream<String> periodic = Stream.periodic(Duration(seconds: 1), (count){
+      return count.toString();
     });
 
-    streamPeriodic.listen((event) {
-      print("Listen2 $event");
-    });
+    textController.sink.addStream(periodic);
 
+    // Thêm dữ liệu (sink)
+    // textController.sink.add("Tèo");
+    // textController.sink.add("Tý");
+
+    // Lấy dữ liệu (stream)
+    textController.stream.take(10).listen((event) {
+      print(event);
+    });
   }
 
 
