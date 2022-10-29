@@ -16,11 +16,32 @@ class _DemoStreamPageState extends State<DemoStreamPage> {
     // 1: Single Subscription
 
     // Khởi tao stream thông qua future
-    Future<String> future = Future.delayed(Duration(seconds: 1), () => "Hello");
-    Stream<String> textStream = Stream.fromFuture(future);
+    // Future<String> future = Future.delayed(Duration(seconds: 1), () => "Hello");
+    // Stream<String> textStream = Stream.fromFuture(future);
+    //
+    // textStream.listen((event) {
+    //   print(event);
+    // });
 
-    textStream.listen((event) {
-      print(event);
+    // Khởi tạo stream thông qua iterable
+    // Iterable<int> iterable = Iterable.generate(10,(index) {
+    //   return index;
+    // });
+    //
+    // Stream<int> numberStream = Stream.fromIterable(iterable);
+    // numberStream.listen((event) {
+    //   print(event);
+    // });
+
+    // Khởi tạo stream thông qua periodic
+    Stream<int> streamPeriodic = Stream.periodic(
+                                          Duration(seconds: 1), (count) => count).asBroadcastStream();
+    streamPeriodic.listen((event) {
+      print("Listen1 $event");
+    });
+
+    streamPeriodic.listen((event) {
+      print("Listen2 $event");
     });
 
   }
