@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,14 @@ class DemoStreamPage extends StatefulWidget {
 }
 
 class _DemoStreamPageState extends State<DemoStreamPage> {
+
+  StreamController<int> numberController = StreamController();
+
+  @override
+  void initState() {
+    super.initState();
+    numberController.sink.add(0);
+  }
 
   @override
   void didUpdateWidget(covariant DemoStreamPage oldWidget) {
@@ -49,25 +58,34 @@ class _DemoStreamPageState extends State<DemoStreamPage> {
     // });
 
     // 2: StreamController
-
-    StreamController<String> textController = StreamController();
-
-    Stream<String> periodic = Stream.periodic(Duration(seconds: 1), (count){
-      return count.toString();
-    });
-
-    textController.sink.addStream(periodic);
-
-    // Thêm dữ liệu (sink)
-    // textController.sink.add("Tèo");
-    // textController.sink.add("Tý");
-
-    // Lấy dữ liệu (stream)
-    textController.stream.take(10).listen((event) {
-      print(event);
-    });
+    //
+    // StreamController<String> textController = StreamController();
+    //
+    // Stream<String> periodic = Stream.periodic(Duration(seconds: 1), (count){
+    //   return count.toString();
+    // }).asBroadcastStream();
+    //
+    // periodic.listen((e) {});
+    // textController.sink.addStream(periodic);
+    //
+    // // Thêm dữ liệu (sink)
+    // // textController.sink.add("Tèo");
+    // // textController.sink.add("Tý");
+    //
+    // // Lấy dữ liệu (stream)
+    // textController.stream.take(10).listen((event) {
+    //   print(event);
+    // });
+    //
+    // textController.close();
   }
 
+  void randomNumber() {
+    Future.delayed(Duration(seconds: 3), () {
+      int number = Random().nextInt(10);
+      numberController.sink.add(number);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +93,35 @@ class _DemoStreamPageState extends State<DemoStreamPage> {
       appBar: AppBar(
         title: Text("Demo Stream"),
       ),
-      body: Container(),
+      body: Container(
+        child: Column(
+          children: [
+            StreamBuilder<int>(
+                stream: numberController.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text(snapshot.error.toString());
+                  }
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                    case ConnectionState.active:
+                      return Text(snapshot.data.toString());
+                    default:
+                      return Container();
+                  }
+                }
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  randomNumber();
+                },
+                child: Text("Random number")
+            )
+          ],
+        ),
+      ),
     );
   }
 }
